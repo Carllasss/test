@@ -1,0 +1,38 @@
+[project]
+name = "test"
+version = "0.1.0"
+description = "test task"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "alembic>=1.17.2",
+    "fastapi>=0.124.0",
+    "pydantic>=2.12.5",
+    "pydantic-settings>=2.12.0",
+    "sqlalchemy>=2.0.45",
+    "asyncpg>=0.30.0",
+    "uvicorn>=0.38.0",
+    "jinja2>=3.1.6",
+    "python-multipart>=0.0.20",
+]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.14.8",
+]
+
+[tool.ruff]
+target-version = "py313"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "UP", "B", "A"]
+ignore = ["E501"]
+fixable = ["ALL"]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]  # unused import
+"tests/*" = ["S101"]  # use of assert in tests
+
+[tool.ruff.lint.isort]
+known-first-party = ["my_package"]
