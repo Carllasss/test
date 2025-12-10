@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field
 
 class BitrixLeadCreate(BaseModel):
     user_id: int = Field(..., gt=0)
-    lead_id: str
+    lead_id: int
 
 
 class BitrixLeadDTO(BitrixLeadCreate):
