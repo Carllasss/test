@@ -18,7 +18,7 @@ class UserRepository:
         )
 
         self.db.add(db_user)
-        await self.db.commit()
+        await self.db.flush()
         await self.db.refresh(db_user)
         userDto = UserDTO.from_orm(db_user)
         return userDto

@@ -1,82 +1,86 @@
-from typing import Type, Optional
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import Session
-from contextlib import AbstractContextManager, contextmanager
+from fastapi import Depends
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from app.db.asyncSession import get_async_db
-from app.repo.user import UserRepository
-from app.repo.form import FormRepository
-from app.repo.bitrix import BitrixRepository
+from app.db.asyncSession import AsyncSessionLocal, get_async_db
 from app.repo.admin import AdminRepository
+from app.repo.bitrix import BitrixRepository
+from app.repo.form import FormRepository
+from app.repo.user import UserRepository
 
 
 class UnitOfWork:
-    """Управление всеми репозиториями в одной транзакции"""
+    """Единая точка управления репозиториями в рамках одной транзакции."""
 
     def __init__(self, db: AsyncSession):
         self.db = db
-        self._repositories = {}
+        self._repositories: dict[str, object] = {}
 
-    def __enter__(self):
+    async def __aenter__(self) -> "UnitOfWork":
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    async def __aexit__(self, exc_type, exc_val, exc_tb) -> None:
         if exc_type:
-            self.rollback()
+            await self.rollback()
         else:
-            self.commit()
+            await self.commit()
 
-    def commit(self):
-        self.db.commit()
+    async def commit(self) -> None:
+        await self.db.commit()
 
-    def rollback(self):
-        self.db.rollback()
+    async def rollback(self) -> None:
+        await self.db.rollback()
 
     @property
     def users(self) -> UserRepository:
-        if 'users' not in self._repositories:
-            self._repositories['users'] = UserRepository(self.db)
-        return self._repositories['users']
+        if "users" not in self._repositories:
+            self._repositories["users"] = UserRepository(self.db)
+        return self._repositories["users"]
 
     @property
     def forms(self) -> FormRepository:
-        if 'forms' not in self._repositories:
-            self._repositories['forms'] = FormRepository(self.db)
-        return self._repositories['forms']
+        if "forms" not in self._repositories:
+            self._repositories["forms"] = FormRepository(self.db)
+        return self._repositories["forms"]
 
     @property
     def bitrix(self) -> BitrixRepository:
-        if 'bitrix' not in self._repositories:
-            self._repositories['bitrix'] = BitrixRepository(self.db)
-        return self._repositories['bitrix']
+        if "bitrix" not in self._repositories:
+            self._repositories["bitrix"] = BitrixRepository(self.db)
+        return self._repositories["bitrix"]
 
     @property
     def admins(self) -> AdminRepository:
-        if 'admins' not in self._repositories:
-            self._repositories['admins'] = AdminRepository(self.db)
-        return self._repositories['admins']
+        if "admins" not in self._repositories:
+            self._repositories["admins"] = AdminRepository(self.db)
+        return self._repositories["admins"]
 
 
-class UnitOfWorkFactory:
-    """Фабрика для создания UnitOfWork"""
-
-    @staticmethod
-    @contextmanager
-    def create() -> AbstractContextManager[UnitOfWork]:
-        """Создать UnitOfWork с контекстным менеджером"""
-        db = get_async_db()
+@asynccontextmanager
+async def create_uow(session_factory: async_sessionmaker[AsyncSession] = AsyncSessionLocal) -> AsyncIterator[UnitOfWork]:
+    """
+    Вспомогательная фабрика для создания UoW вне FastAPI DI.
+    """
+    async with session_factory() as session:
+        uow = UnitOfWork(session)
         try:
-            uow = UnitOfWork(db)
             yield uow
-            uow.commit()
+            await uow.commit()
         except Exception:
-            uow.rollback()
+            await uow.rollback()
             raise
-        finally:
-            db.close()
 
-    @staticmethod
-    def get_uow(db: Session) -> UnitOfWork:
-        """Получить UnitOfWork для существующей сессии"""
-        return UnitOfWork(db)
+
+async def get_uow(db: AsyncSession = Depends(get_async_db)) -> AsyncIterator[UnitOfWork]:
+    """
+    Dependency
+    """
+    uow = UnitOfWork(db)
+    try:
+        yield uow
+        await uow.commit()
+    except Exception:
+        await uow.rollback()
+        raise

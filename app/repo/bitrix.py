@@ -17,7 +17,7 @@ class BitrixRepository:
             lead_id=data.lead_id,
         )
         self.db.add(db_bitrix)
-        await self.db.commit()
+        await self.db.flush()
         await self.db.refresh(db_bitrix)
         bitrixDto = BitrixLeadDTO.from_orm(db_bitrix)
         return bitrixDto

@@ -28,7 +28,7 @@ class User(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     last_activity = Column(DateTime, default=datetime.utcnow)
 
-    bitrix_data = relationship("BitrixLead", back_populates="user", uselist=False,cascade="all, delete-orphan")
+    bitrix_data = relationship("BitrixLead", back_populates="user", uselist=False, cascade="all, delete-orphan")
     form_history = relationship("FormHistory", back_populates="user", cascade="all, delete-orphan")
     admin_data = relationship("Admin", back_populates="user", uselist=False, cascade="all, delete-orphan")
 
@@ -45,7 +45,7 @@ class BitrixLead(Base):
     lead_id = Column(Integer, unique=True, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
 
-    user = relationship("User", back_populates="bitrix_lead")
+    user = relationship("User", back_populates="bitrix_data")
 
     def __repr__(self):
         return f"<BitrixLead>(user_id={self.user_id}, lead_id={self.lead_id})"
@@ -57,7 +57,7 @@ class FormHistory(Base):
     __tablename__ = 'form_history'
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey('user.id', ondelete='CASCADE'), unique=True, nullable=False)
+    user_id = Column(Integer, ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
 
     name = Column(String, nullable=False)
     phone = Column(String, nullable=False)
@@ -81,7 +81,7 @@ class Admin(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     last_activity = Column(DateTime, default=datetime.utcnow)
 
-    user = relationship("User", back_populates="admin")
+    user = relationship("User", back_populates="admin_data")
 
     def __repr__(self):
         return f"<Admin>(user_id={self.user_id})"

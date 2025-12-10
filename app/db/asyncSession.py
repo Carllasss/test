@@ -1,12 +1,11 @@
 from typing import Any, AsyncGenerator
 
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
 from sqlalchemy import text
 import asyncio
 
 from app.config.settings import settings
+from app.model.models import Base
 
 engine = create_async_engine(
     settings.ASYNC_DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://"),
@@ -18,10 +17,8 @@ engine = create_async_engine(
 AsyncSessionLocal = async_sessionmaker(
     engine,
     class_=AsyncSession,
-    expire_on_commit=False
+    expire_on_commit=False,
 )
-
-Base = declarative_base()
 
 
 async def get_async_db() -> AsyncGenerator[AsyncSession | Any, Any]:

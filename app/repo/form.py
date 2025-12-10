@@ -20,7 +20,7 @@ class FormRepository:
         )
 
         self.db.add(db_form)
-        await self.db.commit()
+        await self.db.flush()
         await self.db.refresh(db_form)
         formDto = FormDTO.from_orm(db_form)
         return formDto
