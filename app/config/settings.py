@@ -30,8 +30,6 @@ class Settings(BaseSettings):
 
     # ========== Битрикс24 ==========
     BITRIX24_WEBHOOK_URL: Optional[str] = None
-    BITRIX24_USER_ID: Optional[str] = None
-    BITRIX24_AUTH_TOKEN: Optional[str] = None
 
     # ========== Веб-приложение ==========
     WEBAPP_HOST: str = "0.0.0.0"
@@ -47,6 +45,13 @@ class Settings(BaseSettings):
     # ========== Настройки приложения ==========
     DEBUG: bool = False
     ENVIRONMENT: str = "development"  # development, production
+
+    GOOGLE_SERVICE_ACCOUNT: str = './service_account.json'
+    SHEET_DOC_ID: str = None
+    CHROMA_PERSIST_DIR: str = None
+    CACHE_TTL: int = 300
+
+    OLLAMA_HOST: str = "http://ollama:11434"
 
     # Настройки для pydantic
     model_config = SettingsConfigDict(

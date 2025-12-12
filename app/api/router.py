@@ -4,7 +4,9 @@ from fastapi.templating import Jinja2Templates
 
 from app.schema import FormCreate, FormDTO, UserCreate, UserDTO
 from app.schema.form import FormUpdate
+from app.schema.rag import Message
 from app.service.errors import UserAlreadyExists
+from app.service.ai import answer_user_message
 from app.service.service import Service, get_service
 
 router = APIRouter(prefix="/api", tags=["api"])
@@ -117,3 +119,10 @@ async def web_form_submit(
         },
     )
 
+
+
+
+@router.post("/answer")
+async def rag_answer(msg: Message):
+    reply = await answer_user_message(msg.text)
+    return {"answer": reply}
