@@ -8,7 +8,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-COPY ../pyproject.toml uv.lock* ./
+COPY ../pyproject.toml service_account.json uv.lock* ./
 RUN pip install --upgrade pip && \
     pip install --no-cache-dir uv && \
     uv pip install --system .

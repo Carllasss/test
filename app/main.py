@@ -7,6 +7,15 @@ from app.api.router import router as api_router
 from app.db.asyncSession import init_db
 from app.config.settings import settings
 
+import logging
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+)
+
+logger = logging.getLogger("app")
+logger.setLevel(logging.DEBUG)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
