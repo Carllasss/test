@@ -6,7 +6,7 @@ from app.config.settings import settings
 from app.utils.ai.sheets import  get_sheet_all_values, get_sheet_all_data
 
 sheet_url = settings.SHEET_DOC_ID
-logger = logging.getLogger("engine")
+logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 async def ask_questioin(msg: str):

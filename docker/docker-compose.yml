@@ -24,7 +24,6 @@ services:
       - app_network
 
   api:
-
     build:
       context: ..
       dockerfile: docker/Dockerfile
@@ -38,6 +37,27 @@ services:
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     networks:
       - app_network
+
+  bot:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.bot
+    env_file:
+      - ../env.example
+    environment:
+      - DOCKER_ENV=1
+      - API_HOST=api
+      # WEBAPP_URL должен быть установлен в .env файле с публичным HTTPS URL
+      # Пример: WEBAPP_URL=https://yourdomain.com
+    depends_on:
+      api:
+        condition: service_started
+      db:
+        condition: service_healthy
+    command: python -m bot.main
+    networks:
+      - app_network
+    restart: unless-stopped
 
   ollama:
     image: ollama/ollama:latest

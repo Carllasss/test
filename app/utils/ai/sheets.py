@@ -4,7 +4,7 @@ import gspread
 from google.oauth2.service_account import Credentials
 
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
-logger = logging.getLogger("sheets")
+logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 # Авторизация через Service Account

@@ -33,3 +33,10 @@ class BitrixRepository:
         if not bitrixLead:
             return None
         return BitrixLeadDTO.from_orm(bitrixLead)
+
+    async def count_all(self) -> int:
+        """Подсчет всех лидов в Bitrix24"""
+        from sqlalchemy import func
+        stmt = select(func.count(BitrixLead.id))
+        result = await self.db.execute(stmt)
+        return result.scalar_one() or 0

@@ -1,0 +1,23 @@
+FROM python:3.12-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1
+
+WORKDIR /app
+
+# Копируем файлы зависимостей
+COPY pyproject.toml uv.lock* ./
+
+# Устанавливаем только необходимые зависимости для бота
+# (aiogram, httpx, pydantic-settings)
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir uv && \
+    uv pip install --system aiogram httpx pydantic-settings
+
+# Копируем только код бота (не копируем app)
+COPY bot ./bot
+
+# Запускаем бота
+CMD ["python", "-m", "bot.main"]
+

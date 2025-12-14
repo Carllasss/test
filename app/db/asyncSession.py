@@ -1,3 +1,4 @@
+import logging
 from typing import Any, AsyncGenerator
 
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
@@ -6,6 +7,9 @@ import asyncio
 
 from app.config.settings import settings
 from app.model.models import Base
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 engine = create_async_engine(
     settings.ASYNC_DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://"),
@@ -37,4 +41,4 @@ async def init_db():
 
     async with AsyncSessionLocal() as session:
         result = await session.execute(text("SELECT 1"))
-        print("Database connection established")
+        logger.info("Database connection established")

@@ -5,7 +5,7 @@ import httpx
 
 OLLAMA_HOST = "http://ollama:11434"
 OLLAMA_MODEL= 'qwen2.5:3b-instruct'
-logger = logging.getLogger("llm")
+logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 def classify_question_ollama(question: str) -> str:

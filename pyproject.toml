@@ -21,6 +21,7 @@ dependencies = [
     "aiohttp>=3.13.2",
     "ollama>=0.6.1",
     "rapidfuzz>=3.14.3",
+    "aiogram>=3.13.1",
 ]
 
 [dependency-groups]
