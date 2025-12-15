@@ -17,7 +17,8 @@ async def ask_questioin(msg: str):
         logger.debug(data)
     elif category == 'product':
         data = get_sheet_all_data(sheet_url, 'Товары')
-
+        # Попытка уменьшить контекст для иишки
+        # Модель слишком маленкая для обработки полного списка товаров
         filtered = filter_products(data, msg)
 
         if not filtered:
