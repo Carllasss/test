@@ -12,3 +12,7 @@
 - Настроенный `BOT_TOKEN` в env
 - Настроенный `BITRIX24_WEBHOOK_URL` (опционально)
 - В корне проекта должен лежать файл 'service_account.json' из Google Cloud API
+- Расширить доступную оперативную память под докер до 4 гб (из-за модели)
+
+## Тесты
+- Для тестов `uv sync`, затем `uv run pytest -W "ignore::DeprecationWarning"`.

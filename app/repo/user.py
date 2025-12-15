@@ -65,7 +65,7 @@ class UserRepository:
             # Нужно убрать админские права
             if existing_admin:
                 # Удаляем запись админа
-                self.db.delete(existing_admin)
+                await self.db.delete(existing_admin)
                 await self.db.flush()
         
         if admin and existing_admin:
