@@ -1,0 +1,88 @@
+version: "3.9"
+
+networks:
+  app_network:
+    driver: bridge
+
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: app
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d app"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app_network
+
+  api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    env_file:
+      - ../env.example
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    networks:
+      - app_network
+
+  bot:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.bot
+    env_file:
+      - ../env.example
+    environment:
+      - DOCKER_ENV=1
+      - API_HOST=api
+      # WEBAPP_URL должен быть установлен в .env файле с публичным HTTPS URL
+      # Пример: WEBAPP_URL=https://yourdomain.com
+    depends_on:
+      api:
+        condition: service_started
+      db:
+        condition: service_healthy
+    command: python -m bot.main
+    networks:
+      - app_network
+    restart: unless-stopped
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    restart: unless-stopped
+    volumes:
+       - ollama_data:/root/.ollama
+    networks:
+      - app_network
+    entrypoint: >
+      sh -c "
+        ollama serve &
+        sleep 2 &&
+        ollama pull qwen2.5:3b-instruct &&
+        ollama run qwen2.5:3b-instruct &&
+        tail -f /dev/null
+      "
+    deploy:
+      resources:
+        limits:
+          memory: 4g
+
+volumes:
+  postgres_data:
+  ollama_data:
+
