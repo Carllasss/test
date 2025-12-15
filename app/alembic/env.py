@@ -20,8 +20,8 @@ if config.config_file_name is not None:
 
 target_metadata = models.Base.metadata
 
-# Inject DB url from env / settings
-config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
+# Inject async DB url from env / settings
+config.set_main_option("sqlalchemy.url", settings.ASYNC_DATABASE_URL)
 
 
 def run_migrations_offline() -> None:
