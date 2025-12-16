@@ -73,8 +73,8 @@ services:
       sh -c "
         ollama serve &
         sleep 2 &&
-        ollama pull qwen2.5:3b-instruct &&
-        ollama run qwen2.5:3b-instruct &&
+        ollama pull llama3.2:3b &&
+        ollama run llama3.2:3b &&
         tail -f /dev/null
       "
     deploy:
