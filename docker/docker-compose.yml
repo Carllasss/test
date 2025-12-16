@@ -73,14 +73,19 @@ services:
       sh -c "
         ollama serve &
         sleep 2 &&
-        ollama pull qwen2.5:3b-instruct &&
-        ollama run qwen2.5:3b-instruct &&
+        ollama pull llama3.2:3b &&
+        ollama run llama3.2:3b &&
         tail -f /dev/null
       "
     deploy:
       resources:
         limits:
           memory: 4g
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [ gpu ]
 
 volumes:
   postgres_data:

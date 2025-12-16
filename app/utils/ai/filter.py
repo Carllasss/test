@@ -20,7 +20,7 @@ def filter_products(
     products: list[dict],
     question: str,
     limit: int = 3,
-    threshold: int = 60
+    threshold: int = 50
 ) -> list[dict]:
     scored = []
 
