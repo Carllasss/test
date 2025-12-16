@@ -9,7 +9,7 @@ sheet_url = settings.SHEET_DOC_ID
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
-async def ask_questioin(msg: str):
+async def ask_questioin(msg: str) -> str:
 
     category = classify_question_ollama(msg)
     if category == 'general' or category == 'general.':
@@ -22,15 +22,16 @@ async def ask_questioin(msg: str):
         filtered = filter_products(data, msg)
 
         if not filtered:
-            return {"answer": "Я не нашёл такой товар в каталоге."}
+            return "Я не нашёл такой товар в каталоге."
 
         data = build_products_context(filtered)
 
     else:
-        return {'answer': 'Не удалось определить категорию'}
+        return "Не удалось определить категорию"
 
 
     logger.debug(data)
     answer = generate_answer_ollama(data, msg)
 
-    return {"answer": answer}
+    # Возвращаем только текст ответа, без обёртки в словарь
+    return answer

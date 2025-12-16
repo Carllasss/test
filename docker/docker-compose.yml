@@ -81,6 +81,11 @@ services:
       resources:
         limits:
           memory: 4g
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [ gpu ]
 
 volumes:
   postgres_data:
